@@ -30,6 +30,7 @@ opts_chunk$set(comment = "",
                fig.show = "hold")
 # suppress summarise() grouping warning 
 options(dplyr.summarise.inform = F)
+
 # use effects contrast coding to interpret effects from categorical variables as main effects 
 options(contrasts = c("contr.sum", "contr.poly"))
 ```
