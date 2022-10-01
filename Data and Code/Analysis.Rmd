@@ -30,7 +30,6 @@ opts_chunk$set(comment = "",
                fig.show = "hold")
 # suppress summarise() grouping warning 
 options(dplyr.summarise.inform = F)
-
 # use effects contrast coding to interpret effects from categorical variables as main effects 
 options(contrasts = c("contr.sum", "contr.poly"))
 ```
@@ -58,7 +57,6 @@ print_table = function(data, format = "html", digits = 2){
 
 # Data Editing
 ##  Create List of Studies to be included
-
 ```{r}
 
 studies <- c("Phillips & Knobe, 2009", 
@@ -2644,7 +2642,7 @@ kp2019b_dis_statsrep %>%
 # New Effect
 ### Neutral + Ignorant
 kp2019b_disj_statsnew <- kp2019b_disj %>% filter(Scenario == "Neutral" | Scenario == "Ignorant") %>%
-  group_by(QuestionType, OtherCondition) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response))
 
@@ -4864,7 +4862,7 @@ pk2009ceo <- ld %>% filter(Study == "Petitt & Knobe, 2009, CEO")
 # Original Effect
 ### Neutral + Intentional Violation
 pk2009ceo_statsrep <- pk2009ceo %>% filter(Scenario == "Neutral" | Scenario == "Intentional Violation") %>%
-  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario, OtherCondition) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response)) 
 pk2009ceo_statsrep %>% 
@@ -4874,7 +4872,7 @@ pk2009ceo_statsrep %>%
 # New Effect
 ### Neutral + Ignorant
 pk2009ceo_statsnew <- pk2009ceo %>% filter(Scenario == "Neutral" | Scenario == "Ignorant") %>%
-  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario, OtherCondition) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response)) 
 pk2009ceo_statsnew%>% 
@@ -5072,225 +5070,7 @@ mtable$cfe_newEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <
 ```
 
 
-## Petitt & Knobe, 2009, CEO, opposition
-
-```{r}
-pk2009ceo <- ld %>% filter(Study == "Petitt & Knobe, 2009, CEO")
-
-######################################## Descriptives All Ratings
-# Original Effect
-### Neutral + Intentional Violation
-pk2009ceo_statsrep <- pk2009ceo %>% filter(Scenario == "Neutral" | Scenario == "Intentional Violation") %>%
-  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
-                                   sd=sd(response), 
-                                   n=length(response)) 
-pk2009ceo_statsrep%>% 
-  print_table()
-
-# New Effect
-### Neutral + Ignorant
-pk2009ceo_statsnew <- pk2009ceo %>% filter(Scenario == "Neutral" | Scenario == "Ignorant") %>%
-  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
-                                   sd=sd(response), 
-                                   n=length(response)) 
-pk2009ceo_statsnew %>% 
-  print_table()
-
-############################################## DV Rating
-############ Original Effect
-## We will examine if original effect is replicated
-pk2009ceo_reptest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Dependent Variable"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "Dependent Variable"])
-
-## Replicated? Yes!
-pander(pk2009ceo_reptest) 
-
-pk2009ceo_repeffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Dependent Variable"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "Dependent Variable"])
-## Original Effect Size
-print_table(pk2009ceo_repeffect)
-
-############ New Effect
-## We will examine if new effect is produced (Ignorance changes effect)
-pk2009ceo_newtest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Dependent Variable"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & pk2009ceo$QuestionType == "Dependent Variable"])
-
-pander(pk2009ceo_newtest)                                           
-
-pk2009ceo_neweffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Dependent Variable"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "Dependent Variable"])
-## New Effect Size
-print_table(pk2009ceo_neweffect)
-```
-```{r, include=FALSE}
-#putting replication effects in the meta-analysis table
-mtable$repEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_repeffect$Cohens_d
-mtable$repEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_repeffect$CI_high
-mtable$repEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_repeffect$CI_low
-
-mtable$effectType[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- "d"
-mtable$replication[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- "yes"
-
-#putting ignorance effects in the meta-analysis table
-mtable$newEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_neweffect$Cohens_d
-mtable$newEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_neweffect$CI_high
-mtable$newEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_neweffect$CI_low
-
-############################################## Knowledge Rating
-
-############ Original Effect
-pk2009ceo_k_reptest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Knowledge Check"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "Knowledge Check"])
-
-pk2009ceo_k_repeffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Knowledge Check"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "Knowledge Check"])
-
-#putting replication effects in the meta-analysis table
-mtable$k_repEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_k_repeffect$Cohens_d
-mtable$k_repEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_k_repeffect$CI_high
-mtable$k_repEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_k_repeffect$CI_low
-
-############ New Effect
-
-pk2009ceo_k_newtest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Knowledge Check"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "Knowledge Check"])
-
-pk2009ceo_k_neweffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Knowledge Check"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "Knowledge Check"])
-
-
-#putting ignorance effects in the meta-analysis table
-mtable$k_newEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_k_neweffect$Cohens_d
-mtable$k_newEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_k_neweffect$CI_high
-mtable$k_newEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_k_neweffect$CI_low
-
-############################################## Should have known Rating
-
-############ Original Effect
-pk2009ceo_sk_reptest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Should Know"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "Should Know"])
-
-pk2009ceo_sk_repeffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Should Know"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "Should Know"])
-
-#putting replication effects in the meta-analysis table
-mtable$sk_repEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_sk_repeffect$Cohens_d
-mtable$sk_repEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_sk_repeffect$CI_high
-mtable$sk_repEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_sk_repeffect$CI_low
-
-############ New Effect
-
-pk2009ceo_sk_newtest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Should Know"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "Should Know"])
-
-pk2009ceo_sk_neweffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "Should Know"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "Should Know"])
-
-
-#putting ignorance effects in the meta-analysis table
-mtable$sk_newEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_sk_neweffect$Cohens_d
-mtable$sk_newEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_sk_neweffect$CI_high
-mtable$sk_newEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_sk_neweffect$CI_low
-
-############################################## CF Action Rating
-
-############ Original Effect
-pk2009ceo_cfa_reptest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Action"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "CF Action"])
-
-pk2009ceo_cfa_repeffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Action"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "CF Action"])
-
-#putting replication effects in the meta-analysis table
-mtable$cfa_repEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfa_repeffect$Cohens_d
-mtable$cfa_repEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfa_repeffect$CI_high
-mtable$cfa_repEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfa_repeffect$CI_low
-
-############ New Effect
-
-pk2009ceo_cfa_newtest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Action"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "CF Action"])
-
-pk2009ceo_cfa_neweffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Action"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "CF Action"])
-
-
-#putting ignorance effects in the meta-analysis table
-mtable$cfa_newEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfa_neweffect$Cohens_d
-mtable$cfa_newEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfa_neweffect$CI_high
-mtable$cfa_newEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfa_neweffect$CI_low
-
-############################################# CF Action Rating
-
-############ Original Effect
-pk2009ceo_cfe_reptest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Epistemic"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "CF Epistemic"])
-
-pk2009ceo_cfe_repeffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Epistemic"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Intentional Violation" & 
-                                             pk2009ceo$QuestionType == "CF Epistemic"])
-
-#putting replication effects in the meta-analysis table
-mtable$cfe_repEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfe_repeffect$Cohens_d
-mtable$cfe_repEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfe_repeffect$CI_high
-mtable$cfe_repEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfe_repeffect$CI_low
-
-############ New Effect
-
-pk2009ceo_cfe_newtest <- t.test(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Epistemic"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "CF Epistemic"])
-
-pk2009ceo_cfe_neweffect <- cohens_d(pk2009ceo$response[pk2009ceo$Scenario == "Neutral" & 
-                                                      pk2009ceo$QuestionType == "CF Epistemic"],
-                         pk2009ceo$response[pk2009ceo$Scenario == "Ignorant" & 
-                                             pk2009ceo$QuestionType == "CF Epistemic"])
-
-
-#putting ignorance effects in the meta-analysis table
-mtable$cfe_newEffect[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfe_neweffect$Cohens_d
-mtable$cfe_newEffectCIh[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfe_neweffect$CI_high
-mtable$cfe_newEffectCIl[mtable$study=="Petitt & Knobe, 2009, CEO, opposed to"] <- pk2009ceo_cfe_neweffect$CI_low
-
-```
-
-
-## Petitt & Knobe, 2009, bomb, 
+## Petitt & Knobe, 2009, bomb, intended to
 
 ```{r pk2009b, warning=FALSE, message=FALSE}
 
@@ -5301,7 +5081,7 @@ pk2009b <- ld %>% filter(Study == "Petitt & Knobe, 2009, bomb")
 # Original Effect
 ### Neutral + Intentional Violation
 pk2009b_statsrep <- pk2009b %>% filter(Scenario == "Neutral" | Scenario == "Intentional Violation") %>%
-  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario, OtherCondition) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response)) 
 pk2009b_statsrep%>% 
@@ -5310,7 +5090,7 @@ pk2009b_statsrep%>%
 # New Effect
 ### Neutral + Ignorant
 pk2009b_statsnew <- pk2009b %>% filter(Scenario == "Neutral" | Scenario == "Ignorant") %>%
-  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario, OtherCondition) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response)) 
 pk2009b_statsnew%>% 
@@ -6943,7 +6723,7 @@ ul2010t <- ld %>% filter(Study == "Uttich & Lombrozo, 2010, truck trailers")
 # Original Effect
 ### Neutral + Intentional Violation
 ul2010t_statsrep <- ul2010t %>% filter(Scenario == "Neutral" | Scenario == "Intentional Violation") %>%
-  group_by(QuestionType) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response)) 
 
@@ -6954,7 +6734,7 @@ ul2010t_statsrep %>%
 # New Effect
 ### Neutral + Ignorant
 ul2010t_statsrep <- ul2010t %>% filter(Scenario == "Neutral" | Scenario == "Ignorant") %>%
-  group_by(QuestionType) %>% summarise(mean=mean(response), 
+  group_by(QuestionType, Scenario) %>% summarise(mean=mean(response), 
                                    sd=sd(response), 
                                    n=length(response)) 
 
@@ -7164,8 +6944,17 @@ mtable$cfe_newEffectCIl[mtable$study=="Uttich & Lombrozo, 2010, truck trailers"]
 ## Original Meta-Analysis Table
 ```{r}
 #### Original Meta-Analysis Table including all effects
-orig.table <- mtable 
 
+# repEffect = Replicated Effect
+# newEffect = New Effect
+# CIh / CIl = upper/lower confidence Interval
+# k_ = Knowledge Ratings
+# sk_ = Should Know Ratings
+# cfa_ Action Counterfactual Ratings
+# cfe_ Epistemic Counterfactual Ratings
+
+
+orig.table <- mtable 
 print_table(orig.table)
 ```
 
@@ -7279,7 +7068,16 @@ m.table <- m.table %>%
 
 ## Complete Meta-Analysis Table for Analysis
 ```{r, warning=FALSE, message=FALSE}
-## Complete Meta-Analysis Table
+## Complete Meta-Analysis Table with meaningful effect size direction and effect size averages
+
+# repEffect = Replicated Effect
+# newEffect = New Effect
+# CIh / CIl = upper/lower confidence Interval
+# k_ = Knowledge Ratings
+# sk_ = Should Know Ratings
+# cfa_ Action Counterfactual Ratings
+# cfe_ Epistemic Counterfactual Ratings
+
 print_table(m.table)
 ```
 
@@ -7325,11 +7123,29 @@ anova(DV_m0,DV_m1)
 summary(DV_m1) 
 
 ```
+## Analysis Knowledge Rating
+```{r, warning=FALSE, message=FALSE}
+
+############### Knowledge Rating
+
+K_m0 <- lmer(EffectSize ~  (1|study) + (EpistemicState||Paradigm),
+              m.df[m.df$QuestionType=="Knowledge_Check",], REML=F, 
+              control = lmerControl(calc.derivs =FALSE, optimizer ="bobyqa"))
+
+K_m1 <- lmer(EffectSize ~  EpistemicState + (1|study) + (EpistemicState||Paradigm),
+              m.df[m.df$QuestionType=="Knowledge_Check",], REML=F, 
+              control = lmerControl(calc.derivs =FALSE, optimizer ="bobyqa"))
+
+#Main Effect Epistemic State
+anova(K_m0,K_m1)
+summary(K_m1)
+
+```
 
 ## Analysis Should Know Rating
 ```{r, warning=FALSE, message=FALSE}
 
-############### Should Know Rating
+############### Knowledge Rating
 
 SK_m0 <- lmer(EffectSize ~  (1|study) + (EpistemicState||Paradigm),
               m.df[m.df$QuestionType=="Should_Know",], REML=F, 
@@ -7385,8 +7201,8 @@ summary(CFE_m1)
 
 ```{r, include=FALSE}
 ## Prepare Figures
-#Order Studies alphabetically
 
+#Order Studies alphabetically
 level_order <- c(
   "Average",
   "Szabo & Knobe, 2003, pens, professor",
@@ -7407,18 +7223,14 @@ level_order <- c(
   "Kominsky & Phillips, 2019, motion detector, conjunctive",
   "Kominsky & Phillips, 2019, computer, conjunctive", 
   "Kominsky & Phillips, 2019, bridge, conjunctive",
-  "Fraser & Knobe, 2008"            
-  )
+  "Fraser & Knobe, 2008")
 
-#Order Paradigms alphabetically
-cbPalette <- c("#CC6677", "#DDCC77", "#117733", "#AA4499", 
-                            "#6699CC", "#999933", "#888888")
-colorBlindGrey8   <- c( "#56B4E9", "#009E73", 
-                       "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#999999")
+#Color Blind Friendly Color Palette
+cbPalette <- c("#CC6677", "#DDCC77", "#117733", "#AA4499", "#6699CC", "#999933", "#888888")
 
 ```
 
-# Figures
+# Plots
 ## Effect sizes figure: Knowledge Ratings (Figure 1)
 
 ```{r graph4, echo=FALSE, message=FALSE,warning=FALSE, fig.height=7, fig.width=10}
@@ -7426,25 +7238,27 @@ colorBlindGrey8   <- c( "#56B4E9", "#009E73",
 figK <- m.table %>% filter(!is.na(k_repEffect)) %>%
               ggplot(aes(x=factor(study, level = level_order),
                          y=k_repEffect, 
-                         colour= Paradigm, 
+                         fill= Paradigm,
                          order= Paradigm)) +
                ggtitle("Effect Sizes of Knowledge Rating") +
                 geom_hline(yintercept=0,lty=4) +
                 geom_linerange(aes(ymin=k_repEffectCIl,
                                    ymax=k_repEffectCIh,  
                                    colour=Paradigm),
-                               lty=3) + 
+                               lty=3,
+                               alpha=.9) + 
                 geom_linerange(aes(ymin=k_newEffectCIl,
                                    ymax=k_newEffectCIh, 
                                    colour=Paradigm),  
-                               lty=4) + 
+                               lty=4,
+                               alpha=.9) + 
                 geom_point(shape =22, size=4, 
-                           fill="lightgrey", 
-                           stroke =.9) +
+                           stroke =1,
+                           alpha=.7) +
                 geom_point(aes(y=k_newEffect),
-                           shape=22,size=2, 
-                           fill="lightgrey", 
-                           stroke =.9)+
+                           shape=22,
+                           size=3, 
+                          alpha=.7)+
                 coord_cartesian(ylim=c(-3,3)) +
                 xlab("") + 
                 ylab("Effect Size d") +
@@ -7453,26 +7267,26 @@ figK <- m.table %>% filter(!is.na(k_repEffect)) %>%
                 theme(strip.text = element_text(size=14),
                       axis.text = element_text(size=12),
                       plot.title = element_text(size=18, face="bold",hjust=.5),
-                      axis.title.x = element_text(size=16, vjust=-0.2),
-                      axis.title.y = element_text(size=16, vjust=0.35),
+                      axis.title.x = element_text(size=16, vjust=.2),
+                      axis.title.y = element_text(size=16, vjust=.35),
                       legend.title = element_text(size=16),
                       legend.text = element_text(size=12),
-                      #legend.position = c(.8,.3),
                       panel.grid = element_blank(),
                       legend.position="top",
-                      legend.justification='left'
-                      )
-                  #scale_fill_grey()
+                      legend.justification='left')+
+      scale_fill_manual(values = cbPalette)+
+      scale_color_manual(values = cbPalette)
 
+# Plot Figure
 plot(figK)
 
+# Save Figure
 ggsave(figK,            # Save transparent png file
-       filename = "figK.png",
+       filename = "figK.pdf",
        bg = "transparent",
        width = 10, height = 7)
 
 ```
-
 
 
 ## Effect sizes figure: DV Rating (Figure 2)
@@ -7488,24 +7302,26 @@ fig <- m.table %>% filter(!is.na(repEffect)) %>%
                                    ymax=repEffectCIh, 
                                    colour=Paradigm),
                                lty=3,
-                               alpha=.7,
+                               alpha=.9,
                                stroke = 1) + 
                geom_linerange(aes(ymin=newEffectCIl,
                                    ymax=newEffectCIh, 
                                    colour=Paradigm),
                                lty=4,
-                               alpha=.5, 
-                               stroke = 1) + 
+                               alpha= .7, 
+                               stroke = 1) +
+                geom_point(aes(y=repEffect, 
+                               colour=Paradigm),
+                           shape =21, 
+                           size=4, 
+                           alpha= 0.7, 
+                           colour = "black", 
+                           stroke = .9) +
                 geom_point(aes(y=newEffect, 
                                colour=Paradigm),
                            shape=3, size=2, 
-                           stroke = 0.7, 
+                           stroke = .9, 
                            colour = "black")+
-                geom_point(shape =21, 
-                           size=4, 
-                           alpha=.7, 
-                           colour = "black", 
-                           stroke = .7) +
                 coord_cartesian(ylim=c(-3,3)) +
                 xlab("") + 
                 ylab("Effect Size d") +
@@ -7522,20 +7338,14 @@ fig <- m.table %>% filter(!is.na(repEffect)) %>%
                       #legend.position = c(-0, 1), 
                       #legend.justification = c(0, 0),
                       legend.direction = "horizontal",
-                      legend.position="top"
-                )+
-        scale_fill_manual(values = colorBlindGrey8 )+
-      scale_color_manual(values = colorBlindGrey8 )
-  
-                  
-  #scale_fill_manual(values = RColorBrewer::brewer.pal(7, "R4")[2:8])+
-  #scale_color_manual(values = RColorBrewer::brewer.pal(7, "R4")[2:8])
-
+                      legend.position="top")+
+      scale_fill_manual(values = cbPalette)+
+      scale_color_manual(values = cbPalette)
 
 ####Save figure
 plot(fig)
 ggsave(fig,            # Save transparent png file
-       filename = "fig.png",
+       filename = "fig.pdf",
        bg = "transparent",
        width = 10, height = 7)
 ```
@@ -7556,21 +7366,20 @@ figE <- m.table %>% filter(!is.na(cfe_repEffect)) %>%
                                    ymax=cfe_repEffectCIh,  
                                    colour=Paradigm),
                                lty=3,
-                               alpha=.5) + 
-                geom_point(aes(y=cfe_newEffect, 
-                               colour=Paradigm),
-                           shape=23,size=2, 
-                           alpha=.7, 
-                           stroke = .7)+
+                               alpha=.9) + 
                 geom_linerange(aes(ymin=cfe_newEffectCIl,
                                    ymax=cfe_newEffectCIh, 
                                    colour=Paradigm),  
                                lty=4,
-                               alpha=.5) + 
+                               alpha=.9) + 
                 geom_point(shape = 23, 
                            size=4, 
-                           alpha=.5, 
-                           stroke =.7) +
+                           alpha=.7, 
+                           stroke =1) +
+                geom_point(aes(y=cfe_newEffect),
+                         shape=23,size=3, 
+                          alpha=1.2,
+                         stroke = 0.7)+
                 coord_cartesian(ylim=c(-3,3)) +
                 xlab("") + 
                 ylab("Effect Size d") +
@@ -7587,13 +7396,16 @@ figE <- m.table %>% filter(!is.na(cfe_repEffect)) %>%
                       #legend.position = c(-0, 1), 
                       #legend.justification = c(0, 0),
                       legend.direction = "horizontal",
-                      legend.position="top"
-                )
+                      legend.position="top")+
+      scale_fill_manual(values = cbPalette)+
+      scale_color_manual(values = cbPalette)
+
 ####Save plot
 plot(figE)
 
+#### Save Figure
 ggsave(figE,            # Save transparent png file
-       filename = "figE.png",
+       filename = "figE.pdf",
        bg = "transparent",
       width = 10, height = 7)
 ```
@@ -7614,21 +7426,20 @@ figA <- m.table %>% filter(!is.na(cfa_repEffect)) %>%
                                    ymax=cfa_repEffectCIh,  
                                    colour=Paradigm),
                                lty=3,
-                               alpha=.7) + 
-                geom_point(aes(y=cfa_newEffect, 
-                               colour=Paradigm),
-                           shape=24,size=2, 
-                           alpha=.7, 
-                           stroke = 0.7)+
+                               alpha=.9) + 
                 geom_linerange(aes(ymin=cfa_newEffectCIl,
                                    ymax=cfa_newEffectCIh, 
                                    colour=Paradigm),  
                                lty=4,
-                               alpha=.7) + 
+                               alpha=.9) +
                 geom_point(shape = 24, 
                            size=4, 
-                           alpha=.5,
-                           stroke = 0.7) +
+                           alpha=.7,
+                           stroke = 1) +
+                geom_point(aes(y=cfa_newEffect),
+                           shape=24,size=2, 
+                           alpha= 1.2, 
+                           stroke = .7)+
                 coord_cartesian(ylim=c(-3,3)) +
                 xlab("") + 
                 ylab("Effect Size d") +
@@ -7642,17 +7453,17 @@ figA <- m.table %>% filter(!is.na(cfa_repEffect)) %>%
                       legend.title = element_text(size=15),
                       legend.text = element_text(size=13),
                       panel.grid = element_blank(),
-                      #legend.position = c(-0, 1), 
-                      #legend.justification = c(0, 0),
                       legend.direction = "horizontal",
-                      legend.position="top"
-                 )
+                      legend.position="top")+
+       scale_fill_manual(values = cbPalette)+
+       scale_color_manual(values = cbPalette)
 
+## Plot Figure
 plot(figA)
 
 ####Save plot
 ggsave(figA,            # Save transparent png file
-       filename = "figA.png",
+       filename = "figA.pdf",
        bg = "transparent",
        width = 10, height = 7)
 ```
