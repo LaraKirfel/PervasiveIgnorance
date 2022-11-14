@@ -1,0 +1,125 @@
+---
+title: "Effect Size Estimation from Test Statistic in Original Studies"
+output: html_document
+date: '2022-11-14'
+---
+
+## Installing Relevant Packages
+```{r}
+install.packages('effectsize')
+```
+## Loading Relevant Packages
+
+```{r}
+library('effectsize')
+```
+
+## Phillips & Knobe, 2009
+```{r}
+t_to_d(t = 4.7, df_error = 50, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Knobe & Fraser, 2008
+```{r}
+t_to_d(t = 5.5, df_error = 17, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+## Cushman, Knobe, Sinnott & Armstong, 2008
+```{r}
+t_to_d(t = 4.3, df_error = 298, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Young & Phillips, 2011
+```{r}
+# passive
+t_to_d(t = 2.22, df_error = 44, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Young & Phillips, 2011, ship
+```{r}
+# active
+t_to_d(t = 2.22, df_error = 44, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Young & Phillips, 2011, doctor
+```{r}
+# active
+t_to_d(t = 3.48, df_error = 38, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Kominsky & Phillips, 2019, battery
+```{r}
+# disjunctive
+t_to_d(t = 5.39, df_error = 85, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+## Kominsky & Phillips, 2019, bridge
+```{r}
+# conjunctive
+t_to_d(t = -11.83, df_error = 41, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+## Kominsky & Phillips, 2019, computer
+```{r}
+# conjunctive
+t_to_d(t = -5.59, df_error = 73, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Kominsky & Phillips, 2019, computer
+```{r}
+# conjunctive
+t_to_d(t = -5.59, df_error = 73, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+
+## Pettit & Knobe, 2009, decide/desire
+```{r}
+# decide
+t_to_d(t = 2.4, df_error = 35, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+# desire (Tannenbaum, Ditto &) Pizarro
+t_to_d(t = -3.6, df_error = 52, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
+## Pettit & Knobe, 2009, advocate/in favour of
+```{r}
+
+F_to_d(f = 4.6, df=1, df_error = 58, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+```
+
+## Pettit & Knobe, 2009, opposed to
+```{r}
+
+t_to_d(t = 2.0, df_error = 54, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+```
+
+## Pettit & Knobe, 2009, intended to
+```{r}
+
+t_to_d(t = 2.5, df_error = 35, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+```
+
+## Knobe & Szabo, captain
+```{r}
+
+t_to_d(t = 7.9, df_error = 40, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+```
+
+## Knobe & Szabo, pen
+```{r}
+
+F_to_d(f = 43.6, df=1, df_error = 76, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+```
+
+## Knobe & Szabo, bull's eye
+```{r}
+
+t_to_d(t = 7.1, df_error = 50, paired = FALSE, ci = 0.95, alternative = "two.sided")
+
+```
+
+## Uttich & Lombrozo, 2010
+```{r}
+
+F_to_d(f = 12.83, df=1, df_error = 288, paired = FALSE, ci = 0.95, alternative = "two.sided")
+```
